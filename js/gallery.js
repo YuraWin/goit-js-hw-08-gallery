@@ -1,9 +1,16 @@
 import srcGallery from '../gallery-items.js';
-const galleryContainer = document.querySelector('.js-gallery');
 const galleryMarkup = createGalleryMarkup(srcGallery);
+
+const galleryContainer = document.querySelector('.js-gallery');
+const modalContainer = document.querySelector('.js-lightbox');
+const image = document.querySelector('.lightbox__image');
+const closeBtn = document.querySelector('button[data-action="close-lightbox"]');
+const areaOverlay = document.querySelector('div.lightbox__overlay');
 
 galleryContainer.insertAdjacentHTML('beforeend', galleryMarkup);
 galleryContainer.addEventListener('click', onFotoGalleryClick);
+closeBtn.addEventListener('click', onCloseModalContainer);
+areaOverlay.addEventListener('click', onCloseModalContainer);
 
 function createGalleryMarkup(source) {
   return source
@@ -33,18 +40,31 @@ function onFotoGalleryClick(evt) {
 
   const urlImage = clickElement.dataset.source;
   const altDescription = clickElement.getAttribute('alt');
-  const modalContainer = document.querySelector('.js-lightbox');
 
   openModalContainer();
   openImage(urlImage, altDescription);
+  addKeyEventListener();
 
   function openModalContainer() {
     modalContainer.classList.add('is-open');
-    console.log(modalContainer);
   }
   function openImage(src, alt) {
-    const image = modalContainer.querySelector('.lightbox__image');
     image.src = src;
     image.alt = alt;
   }
+  function addKeyEventListener() {
+    window.addEventListener('keydown', onEscPress);
+  }
+}
+
+function onEscPress(evt) {
+  if (evt.code !== 'Escape') return;
+  onCloseModalContainer();
+}
+
+function onCloseModalContainer() {
+  modalContainer.classList.remove('is-open');
+  window.removeEventListener('keydown', onEscPress);
+  image.src = '';
+  image.alt = '';
 }
